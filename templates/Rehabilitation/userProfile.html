@@ -1,0 +1,266 @@
+{% extends 'Rehabilitation/base.html' %}
+
+{% load mytags %}
+{% block title %}血友阳光{% endblock %}
+
+{% block static %}
+    <link rel="stylesheet" href="/static/css/user.css">
+{% endblock %}
+
+{% block body %}
+    <div class="profile">
+        <header class="profile__heading">
+            <div class="container">
+                <div class="row" style="position: relative;">
+                    <div class="col-md-2 col-sm-3 col-xs-3">
+                        <div class="profile__heading--avatar-warp"><a href=""><img
+                                class="profile__heading--avatar avatar-160"
+                                src="https://avatar-static.segmentfault.com/194/596/1945964498-5e567822ac9b7_huge256"
+                                alt="九思"></a><input type="file" id="avatarFile" name="avatar" class="file hide">
+                            <div class="profile__avatar-uploader"><span>上传头像</span></div>
+                        </div>
+                        {% if current_user and not u.username == current_user.username %}
+                            <div class="profile__heading--social">
+                                <button class="btn btn-primary mt15" id="sendMsg" data-userid="1030000021846509">发起会话
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-5 col-sm-9 col-xs-9">
+                        <h2 class="profile__heading--name">
+                            <span>{{ u.nickname }}</span>
+                            <div class="profile__heading--other">
+                                <div>
+                                    <span class="profile__heading--other-item " onclick="editProfile(this)">昵称 ：<span
+                                            class="profile__city">
+                                    <span class="profile__heading-edit btn btn-xs profile__heading-edit--init"
+                                          data-type="city">
+                                            <i class="fa fa-pencil hide"
+                                               aria-hidden="true"></i>
+                                        {% if u.nickname %}
+                                            {{ u.nickname }}
+                                        {% else %}
+                                            {{ u.username }}
+                                        {% endif %}
+                                    </span></span></span>
+                                </div>
+                                <div class="form-group form form--profile form-inline form__city"
+                                     style="display: none;">
+                                    <input placeholder="昵称" value="{{ u.nickname }}" name="nickname"
+                                           class="input-sm tagsInput form-control mr10">
+                                    <button type="button" class="btn btn-sm btn-primary" name="nickname"
+                                            onclick="sendProfile(this)">保存
+                                    </button>
+                                </div>
+                                <div>
+                            <span class="profile__heading--other-item " onclick="editProfile(this)">性别 ：<span
+                                    class="profile__city">
+                            <span class="profile__heading-edit btn btn-xs profile__heading-edit--init" data-type="city">
+                                    <i class="fa fa-pencil hide"
+                                       aria-hidden="true"></i>{{ u.gender }}</span></span></span>
+                                </div>
+                                <div class="form-group form form--profile form-inline" style="display:none;">
+                                    <label class="checkbox-inline" style="padding-left: 6px;margin-left: 8px;">
+                                        <input type="radio" name="gender"
+                                               value="0">
+                                        <span style="font-size: 15px">保密</span>
+                                    </label>
+                                    <label class="checkbox-inline" style="padding-left: 6px;margin-left: 8px;">
+                                        <input type="radio" name="gender"
+                                               value="1">
+                                        <span style="font-size: 15px">男</span>
+                                    </label>
+                                    <label class="checkbox-inline" style="padding-left: 6px;margin-left: 8px;">
+                                        <input type="radio" name="gender"
+                                               value="2">
+                                        <span style="font-size: 15px">女</span>
+                                    </label>
+                                    <button type="button" class="btn btn-sm btn-primary js-submit" name="gender"
+                                            onclick="sendProfile(this)">保存
+                                    </button>
+                                </div>
+
+                                <div>
+                            <span class="profile__heading--other-item " onclick="editProfile(this)">真实姓名 ：<span
+                                    class="profile__city">
+                            <span class="profile__heading-edit btn btn-xs profile__heading-edit--init" data-type="city">
+                                    <i class="fa fa-pencil hide"
+                                       aria-hidden="true"></i>{{ u.realname }}</span></span></span>
+                                </div>
+                                <div class="form-group form form--profile form-inline form__city"
+                                     style="display: none;">
+                                    <input placeholder="真实姓名" name="realname"
+                                           class="input-sm tagsInput form-control mr10" value="{{ u.realname }}">
+                                    <button type="button" class="btn btn-sm btn-primary" name="realname"
+                                            onclick="sendProfile(this)">保存
+                                    </button>
+                                </div>
+                                <div>
+                            <span class="profile__heading--other-item " onclick="editProfile(this)">邮箱 ：<span
+                                    class="profile__city">
+                            <span class="profile__heading-edit btn btn-xs profile__heading-edit--init" data-type="city">
+                                    <i class="fa fa-pencil hide"
+                                       aria-hidden="true"></i>{{ u.email }}</span></span></span>
+                                </div>
+                                <div class="form-group form form--profile form-inline form__city"
+                                     style="display: none;">
+                                    <input placeholder="邮箱" name="mail"
+                                           class="input-sm tagsInput form-control mr10" value="{{ u.email }}">
+                                    <button type="button" class="btn btn-sm btn-primary" name="mail"
+                                            onclick="sendProfile(this)">保存
+                                    </button>
+                                </div>
+                                <div>
+                            <span class="profile__heading--other-item " onclick="editProfile(this)">
+                                手机号 ：
+                                <span class="profile__city">
+                                    <span class="profile__heading-edit btn btn-xs profile__heading-edit--init"
+                                          data-type="city">
+                                            {{ u.phone }}
+                                    </span>
+                                </span>
+                            </span>
+                                </div>
+                                <div class="form-group form form--profile form-inline form__city"
+                                     style="display: none;">
+                                    <input placeholder="手机号" name="phone"
+                                           class="input-sm tagsInput form-control mr10" value="{{ u.phone }}">
+                                    <button type="button" class="btn btn-sm btn-primary" name="phone"
+                                            onclick="sendProfile(this)">保存
+                                    </button>
+                                </div>
+                                <div>
+                            <span class="profile__heading--other-item" onclick="editProfile(this)">
+                                城市 ：
+                                <span class="profile__city">
+                                    <span class="profile__heading-edit btn btn-xs profile__heading-edit--init"
+                                          data-type="city">
+                                        {{ u.city }}
+                                    </span>
+                                </span>
+                            </span>
+                                </div>
+                                <div class="form-group form form--profile form-inline form__city" style="display: none">
+                                    <input placeholder="城市" name="city"
+                                           class="input-sm tagsInput form-control mr10" value="{{ u.city }}">
+                                    <button type="button" class="btn btn-sm btn-primary" name="city"
+                                            onclick="sendProfile(this)">保存
+                                    </button>
+                                </div>
+                            </div>
+                        </h2>
+                    </div>
+                    <div class="profile__heading--desc col-md-5 col-sm-12 col-xs-12">
+                        <div class="profile__heading--desc-heading"><span
+                                class="profile__heading--desc-heading-dot-warp"><span
+                                class="profile__heading-dot profile__heading-dot--red"></span><span
+                                class="profile__heading-dot profile__heading-dot--yellow"></span><span
+                                class="profile__heading-dot profile__heading-dot--green"></span></span>
+                            <div class="pull-right">
+                            <span data-type="desc" class="profile__heading-edit" onclick="editSignature(this)">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                编辑
+                            </span>
+                            </div>
+                        </div>
+                        <div class="profile__heading--desc-body">
+                            <div class="profile__desc"><p>{{ u.signature }}</p></div>
+                            <div class="profile__heading--desc-body" style="display: none">
+                                <form class="form form--profile form__desc">
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="description"
+                                                  rows="4">{{ u.signature }}</textarea>
+                                    </div>
+                                    <div class="text-right">
+                                        <button type="button" class="btn btn-default mr10"
+                                                onclick="editSignatureCancel(this)">取消
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="sendSignature(this)">保存
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="wrap mt30">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <!-- 个人动态（timeline）开始 -->
+                        <div class="panel panel-default mt30 timeline timeline-jsnotwork">
+                            <div class="panel-heading"><h3 class="panel-title">个人动态</h3></div>
+                            <div class="panel-body pt0 pl0">
+                                <div class="profile__content">
+                                    <div class="tab-content">
+                                        <div class="pl15" style="position:relative">
+                                            <div class="media-body pt15 pb10"><a class="packup" data-toggle="tooltip"
+                                                                                 data-placement="left" title=""
+                                                                                 href=""
+                                                                                 data-original-title="收起"></a>
+                                                <p class="text-muted sentence ">
+                                                    九思 赞了文章 · 2月27日
+                                                </p><!-- 如果是有图片的文章 --><h2 class="h4 title " style="display:block;"><a
+                                                        href="/a/1190000021855553" target="_blank">如何利用 策略模式 优化表单验证</a>
+                                                </h2>
+                                                <div class="row">
+                                                    <div class="col-md-10">
+                                                        <p class="excerpt wordbreak hidden-xs ">
+                                                            之前项目里的验证代码写的很凌乱，最近刚好遇到这个模块的功能需要重构，于是对代码做了大量的优化，记录一下如何利用策略模式优化表单验证的
+                                                            <!--  --></p></div>
+                                                </div><!-- 如果有
+                                bookmarks
+                                 字段 =>
+                                 是一篇文章 --><p class="text-muted mb0"><span class="info--meta mr10">赞 4 </span>
+                                                    <span class="info--meta ml10">评论 2 </span></p></div>
+                                            <!-- media-body 结束 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if current_user and current_user.username == u.username %}
+                        <div class="mt30">
+                            <div class="col-md-2">
+                                <a href="{% url 'Rehabilitation:write' %}">
+                                    <button class="btn btn-primary mt15">
+                                        写文章
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <footer id="footer">
+                <div class="container">
+                    <div class="copyright">
+                        Copyright © 2019-2020<br>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            if ("{{ u.gender }}" === "男") {
+                $("input[type='radio'][value='1']").attr('checked', 'checked')
+            } else if ("{{ u.gender }}" === "女") {
+                $("input[type='radio'][value='2']").attr('checked', 'checked')
+            } else {
+                $("input[type='radio'][value='0']").attr('checked', 'checked')
+            }
+        });
+
+        function editProfile(e) {
+            {% if current_user and current_user.username == u.username %}
+                $(e).parent().css('display', 'none');
+                $(e).parent().next().css('display', 'block');
+            {% endif %}
+        }
+    </script>
+{% endblock %}

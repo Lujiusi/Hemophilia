@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>血友阳光</title>
+    <link rel="shortcut icon" href="/static/img/Hemophilia.png">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <script type="text/javascript" async="" src="/static/js/analytics.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/main.js"></script>
+</head>
+<body data-mod="index" class="index-index ">
+<div class="global-nav sf-header sf-header--index">
+    <nav class="container nav">
+        <div class="row hidden-xs hidden-sm">
+            <div class="col-sm-8 col-md-9 col-lg-9">
+                <ul class="menu list-inline pull-left hidden-xs">
+                    <li class="menu__item"><a href="" class="active-nav">首页</a></li>
+                    <li class="menu__item"><a href="" class="">问答</a></li>
+                    <li class="menu__item"><a href="" class="">专栏</a></li>
+                    <li class="menu__item"><a href="" class="">课程</a></li>
+                    <li class="menu__item"><a href="" class="">活动</a></li>
+                </ul>
+            </div>
+
+            <div class="col-sm-4 col-md-3 col-lg-3 text-right">
+                <ul class="opts list-inline hidden-xs">
+                    <li class="menu__item">
+                        <button class="btn" onclick="loginOrRegister(this)" value="login">登录</button>
+                    </li>
+                    <li class="menu__item">
+                        <button class="btn" onclick="loginOrRegister(this)" value="register">注册</button>
+                    </li>
+                </ul>
+            </div>
+            {#            <div class="col-sm-4 col-md-3 col-lg-3 text-right">#}
+            {#                <ul class="opts list-inline hidden-xs">#}
+            {#                    <li class="menu__item"><a href="">消息<span class="has-unread__count">1</span></a>#}
+            {#                    </li>#}
+            {#                    <li class="opts__item user dropdown hoverDropdown ml0">#}
+            {#                        <a class="avatar-* dropdownBtn user-avatar" data-toggle="dropdown"#}
+            {#                           style="background-image: url('/static/userpic/1945964498-5e567822ac9b7_big64.png')"#}
+            {#                           href=""></a>#}
+            {#                    </li>#}
+            {#                    <li class="menu__item"><a href="">登出</a></li>#}
+            {#                </ul>#}
+            {#            </div>#}
+        </div>
+    </nav>
+</div>
+
+<div class="wrap">
+    <div class="container pt30">
+        <div class="row">
+            <div class="col-xs-12 col-md-9 main">
+                <div role="tabpanel">
+                </div>
+                <div class="stream-list">
+                    <div style="cursor:pointer" onmouseover="this.style.backgroundColor='#F4F9FD'"
+                         onmouseout="this.style.backgroundColor='#FFFFFF'"
+                         onclick="window.open('{% url 'conversation' 1 %}')">
+                        <section data-url="/inbox/1430000021857720" class="stream-list__item">
+                            <div class="media">
+                                <div class="media-left pull-left">
+                                    <a href="/u/dingwan">
+                                        <img class="avatar-40"
+                                             src="/static/img/人工智能.png"></a>
+                                </div>
+                                <div class="media-body">
+                                    <div>
+                                        <a href="/u/dingwan"><strong>丁皖</strong></a>
+                                        <span class="text-muted pull-right">2月27日</span>
+                                    </div>
+                                    <p class="pull-left text-muted mb0 ellipsis">
+                                        asdfafacasda
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div style="cursor:pointer" onmouseover="this.style.backgroundColor='#F4F9FD'"
+                         onmouseout="this.style.backgroundColor='#FFFFFF'"
+                         onclick="window.open('/messages')">
+                        <section data-url="/inbox/1430000021857720" class="stream-list__item">
+                            <div class="media">
+                                <div class="media-left pull-left">
+                                    <a href="/u/dingwan">
+                                        <img class="avatar-40"
+                                             src="/static/img/人工智能.png"></a>
+                                </div>
+                                <div class="media-body">
+                                    <div>
+                                        <a href="/u/dingwan"><strong>丁皖</strong></a>
+                                        <span class="text-muted pull-right">2月27日</span>
+                                    </div>
+                                    <p class="pull-left text-muted mb0 ellipsis">
+                                        asdfafacasda
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div><!-- /.stream-list -->
+                <div class="text-center">
+                </div>
+            </div><!-- /.main -->
+            <div class="col-xs-12 col-md-3 side mt15">
+
+            </div><!-- /.side -->
+        </div>
+    </div>
+</div>
+
+<footer id="footer">
+    <div class="container">
+        <div class="copyright">
+            Copyright © 2019-2020<br>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

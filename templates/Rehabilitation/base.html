@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="shortcut icon" href="/static/img/Hemophilia.png">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <script type="text/javascript" async="" src="/static/js/analytics.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/main.js"></script>
+    {% block static %}{% endblock %}
+    {% csrf_token %}
+</head>
+<body data-mod="index" class="index-index ">
+<div class="global-nav sf-header sf-header--index">
+    <nav class="container nav">
+        <div class="row hidden-xs hidden-sm">
+            <div class="col-sm-8 col-md-9 col-lg-9">
+                <ul class="menu list-inline pull-left hidden-xs">
+                    <li class="menu__item"><a href="" class="active-nav">首页</a></li>
+                    <li class="menu__item"><a href="" class="">问答</a></li>
+                    <li class="menu__item"><a href="" class="">专栏</a></li>
+                    <li class="menu__item"><a href="" class="">课程</a></li>
+                    <li class="menu__item"><a href="" class="">活动</a></li>
+                </ul>
+            </div>
+            {% if not request.user.username %}
+                <div class="col-sm-4 col-md-3 col-lg-3 text-right">
+                    <ul class="opts list-inline hidden-xs">
+                        <li class="menu__item">
+                            <button class="btn" onclick="loginOrRegister(this)" value="login">登录</button>
+                        </li>
+                        <li class="menu__item">
+                            <button class="btn" onclick="loginOrRegister(this)" value="register">注册</button>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="col-sm-4 col-md-3 col-lg-3 text-right">
+                    <ul class="opts list-inline hidden-xs">
+                        <li class="menu__item"><a href="">消息<span class="has-unread__count">1</span></a>
+                        </li>
+                        <li class="opts__item user dropdown hoverDropdown ml0">
+                            <a class="avatar-* dropdownBtn user-avatar" data-toggle="dropdown"
+                               style="background-image: url('/static/userpic/1945964498-5e567822ac9b7_big64.png')"
+                               href="{% url 'Rehabilitation:userProfile' request.user.username %}"></a>
+                        </li>
+                        <li class="menu__item"><a
+                                href="{% url 'Rehabilitation:logout' %}?next={{ request.path }}">登出</a></li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+</div>
+
+
+{% block body %}
+
+{% endblock %}
+<div class="sfmodal modal" id="register" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true" onclick="closePanel(this)">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">注册</h4></div>
+            <div class="modal-body">
+                <div class="sfModal-content">
+                    <div class="row bg-white login-modal">
+                        <div class="col-md-12 login-wrap">
+                            <div class="form-group">
+                                <label for="username" class="control-label">用户名</label>
+                                <input type="text" class="form-control" id="username" tabindex="1" required=""
+                                       placeholder="请输入用户名" onblur="checkUsername(this)">
+                                <span class="help-block err" style="display: none">用户名已存在</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="control-label">密码</label>
+                                <input type="password" class="form-control" required=""
+                                       id="pw1"
+                                       placeholder="不少于 6 位的密码">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="control-label">再次输入密码</label>
+                                <input type="password" class="form-control" required="" id="pw2"
+                                       placeholder="不少于 6 位的密码" onblur="validate()">
+                                <span class="help-block err" style="display: none">两次密码不一致</span>
+                            </div>
+                            <div class="form-group clearfix">
+                                <button type="button" class="btn-block btn btn-primary pl20 pr20 pull-right"
+                                        post_to="{% url 'Rehabilitation:register' %}"
+                                        onclick="register(this)">
+                                    注册
+                                </button>
+                            </div>
+                            <div class="form-group clearfix">
+                                <button class="btn-block btn pl20 pr20 pull-right"
+                                        onclick="loginOrRegister(this)" value="login">
+                                    已有账号登录
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer hidden"></div>
+        </div>
+    </div>
+</div>
+
+<div class="sfmodal modal in" id="login" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true" onclick="closePanel(this)">×</span>
+                </button>
+                <h4 class="modal-title">登录</h4></div>
+            <div class="modal-body">
+                <div class="sfModal-content">
+                    <div class="row bg-white login-modal">
+                        <div class="col-md-12 login-wrap">
+                            <span class="help-block err" style="display: none">用户名或密码错误</span>
+                            <div class="form-group">
+                                <label for="username" class="control-label">用户名</label>
+                                <input type="text" class="form-control" name="username" required=""
+                                       placeholder="请输入用户名">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">密码</label>
+                                <input type="password" class="form-control" name="password" required=""
+                                       placeholder="请输入密码">
+                            </div>
+                            <div class="form-group clearfix">
+                                <button type="button" class="btn-block btn btn-primary pull-right pl20 pr20"
+                                        post_to='{% url 'Rehabilitation:login' %}' next='{{ request.path }}'
+                                        onclick="login(this)">
+                                    登录
+                                </button>
+                            </div>
+                            <div class="form-group clearfix">
+                                <button class="btn-block btn  pl20 pr20 pull-right"
+                                        onclick="loginOrRegister(this)" value="register">
+                                    注册新账号
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer hidden"></div>
+        </div>
+    </div>
+</div>
+
+<footer id="footer">
+    <div class="container">
+        <div class="copyright">
+            Copyright © 2019-2020<br>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

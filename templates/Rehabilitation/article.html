@@ -1,0 +1,205 @@
+{% extends 'Rehabilitation/base.html' %}
+
+{% block title %}学友阳光{% endblock %}
+
+{% block static %}
+
+{% endblock %}
+<link rel="stylesheet" href="/static/css/vendors.css">
+<link rel="stylesheet" href="/static/css/qdetail.css">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+{% block body %}
+    <div class="position-relative">
+        <div class="container my-sm-4 my-1" id="sf-article">
+            <div class="row">
+                <div class="col-12 col-xl w-0">
+                    <div class="card border-0 mb-4">
+                        <div class="card-body p-lg-30">
+                            <div class="d-flex justify-content-between align-items-center mb-3" id="sf-article_author">
+                            </div>
+                            <h1 class="h2 mb-3" id="sf-article_title">
+                                <a class="text-body">{{ art.title }}</a>
+                            </h1>
+                            <a href="{% url 'Rehabilitation:comment' %}?article_id={{ art.id }}">
+                                {% if had_like|length < 1 %}
+                                    <button class="btn btn-primary pull-right mt15" value="{{ art.id }}"
+                                            post_to="{% url 'Rehabilitation:comment' %}" onclick="like(this)">点赞
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-primary pull-right mt15" value="{{ art.id }}"
+                                            style="background-color: red"
+                                            post_to="{% url 'Rehabilitation:comment' %}" onclick="like(this)">已赞
+                                    </button>
+                                {% endif %}
+                            </a>
+                            <h1 class="h2 mb-3" id="sf-article_title">
+                                <a class="text-body" href=""></a>
+                            </h1>
+                            <a class="text-body">作者 ：<a
+                                    href="{% url 'Rehabilitation:userProfile' art.author.nickname %}">{{ art.author.nickname }}</a></a>
+                            <h1 class="h2 mb-3" id="sf-article_title">
+                                <a class="text-body" href=""></a>
+                            </h1>
+
+                            <article class="article fmt article-content" data-license="cc">
+                                {{ art.content|safe }}
+                            </article>
+                            <hr class="mb-0">
+                        </div>
+                    </div>
+                    <div id="comment-area" class="my-4" data-type="article">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <div class="media">
+                                    <div class="mt15 mr10 ">
+                                        <form action="{% url 'Rehabilitation:comment' %}" method="post"
+                                              class="mt15 mb15 clearfix mr10">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="article_id" value="{{ art.id }}">
+                                            <textarea required class="form-control" name="comment"
+                                                      placeholder="仅支持纯文本，不超过 1024 字"></textarea>
+                                            <button class="btn btn-primary pull-right mt15">
+                                                评论
+                                            </button>
+                                        </form>
+                                        <hr class="mt15 mb0">
+                                    </div>
+                                </div>
+                                <div id="comment-body"></div>
+                                <div class="sflex-center comment-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stream-list border-top mt15">
+                        {% for comment, childComment in comment_list.items %}
+
+                            <section class="stream-list__item  mr10">
+                                <div class="media">
+                                    <div class="media-left pull-left">
+                                        <a href="{% url 'Rehabilitation:userProfile' comment.user.nickname %}">
+                                            <img class="avatar-40"
+                                                 src="https://avatar-static.segmentfault.com/194/596/1945964498-5e567822ac9b7_big64"></a>
+                                    </div>
+                                    <div class="media-body">
+                                        <div>
+                                            <a href="{% url 'Rehabilitation:userProfile' comment.user.nickname %}"><strong>{{ comment.user.nickname }}</strong></a>
+                                            <span class="text-muted pull-right">{{ comment.date }}</span>
+                                        </div>
+                                        <div class="clearfix">
+                                            <p class="col-xs-11 pull-left text-muted mb0 fmt p-l-0">
+                                                {{ comment.comment }}
+                                            </p>
+                                            <div class="hover-show pull-right"
+                                                 style="cursor:pointer ;color: #337ab7"
+                                                 onclick="startComment(this)">
+                                                评论
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form class="d-none edit-form edit-reply-form"
+                                      action="{% url 'Rehabilitation:comment' %}" method="post"
+                                      style="margin-top: 10px ;display: none">
+                                    <div class="form-group">
+                                                <textarea autoheight="true"
+                                                          required
+                                                          class="form-control form-control-sm comment-text" rows="1"
+                                                          placeholder="撰写评论 ..."
+                                                          style="overflow: hidden; overflow-wrap: break-word; resize: none;"
+                                                          name="comment" data-init=""></textarea>
+                                    </div>
+
+                                    <div class="my-3 d-flex align-content-center justify-content-end">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm mr-2 edit-top-comment-cancel-btn"
+                                                onclick="cancelComment(this)">
+                                            取消
+                                        </button>
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm">
+                                            评论
+                                        </button>
+                                        <input type="hidden" name="to_comment" value="{{ comment.id }}"
+                                               autocomplete="off">
+                                        <input type="hidden" name="article_id" value="{{ art.id }}">
+                                        {% csrf_token %}
+                                    </div>
+                                </form>
+                            </section>
+                            {% for com in childComment %}
+                                <div>
+                                    <section class="stream-list__item  mr10"
+                                             style="margin-left: 60px;">
+                                        <div class="media">
+                                            <div class="media-left pull-left">
+                                                <a href="{% url 'Rehabilitation:userProfile' com.user.nickname %}">
+                                                    <img class="avatar-40"
+                                                         src="https://avatar-static.segmentfault.com/194/596/1945964498-5e567822ac9b7_big64"></a>
+                                            </div>
+                                            <div class="media-body">
+                                                <div>
+                                                    <a href="{% url 'Rehabilitation:userProfile' com.user.nickname %}"><strong>{{ com.user.nickname }}</strong></a>
+                                                    {% if com.parent_comment.parent_comment.id %}
+                                                        @
+                                                        <a href="{% url 'Rehabilitation:userProfile' com.parent_comment.user.nickname %}"><strong>{{ com.parent_comment.user.nickname }}</strong></a>
+                                                    {% endif %}
+                                                    <span class="text-muted pull-right">{{ com.date }}</span>
+                                                </div>
+                                                <div class="clearfix">
+                                                    <p class="col-xs-11 pull-left text-muted mb0 fmt p-l-0">
+                                                        {{ com.comment }}
+                                                    </p>
+                                                    <div class="hover-show pull-right"
+                                                         style="cursor:pointer ;color: #337ab7"
+                                                         onclick="startComment(this)">
+                                                        评论
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <form class="d-none edit-form edit-reply-form"
+                                              action="{% url 'Rehabilitation:comment' %}" method="post"
+                                              style="margin-top: 10px;display: none">
+                                            <div class="form-group">
+                                                <textarea autoheight="true"
+                                                          class="form-control form-control-sm comment-text" rows="1"
+                                                          placeholder="撰写评论 ..."
+                                                          style="overflow: hidden; overflow-wrap: break-word; resize: none;"
+                                                          name="comment" data-init="{{ com.comment }}"></textarea>
+                                            </div>
+                                            <div class="my-3 d-flex align-content-center justify-content-end">
+                                                <button type="button"
+                                                        class="btn btn-outline-secondary btn-sm mr-2 edit-top-comment-cancel-btn"
+                                                        onclick="cancelComment(this)">
+                                                    取消
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-sm">
+                                                    提交
+                                                </button>
+                                                <input type="hidden" name="to_comment" value="{{ com.id }}"
+                                                       autocomplete="off">
+                                                <input type="hidden" name="article_id" value="{{ art.id }}">
+                                                {% csrf_token %}
+                                            </div>
+                                        </form>
+                                    </section>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    <div id="comment-body">
+                        <div class="media mb-4" id="comment-1050000021860041">
+                            <div class="media-body w-0">
+                                <div class="replies">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
