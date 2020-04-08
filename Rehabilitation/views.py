@@ -66,7 +66,10 @@ class Login(View):
 
 @login_required
 def comment(request):
-    article_id = request.POST.get('article_id', request.GET['article_id'])
+    if request.POST.get('article_id'):
+        article_id = request.POST.get('article_id')
+    else:
+        article_id = request.GET.get('article_id')
     com = request.POST.get('comment')
     to_comment = request.POST.get('to_comment')
     new_comment = Comment()
