@@ -1,0 +1,90 @@
+{% extends 'Rehabilitation/base.html' %}
+
+{% block title %}血友阳光{% endblock %}
+
+{% block body %}
+    <div class="wrapper">
+        <div class="container mt30">
+            <div class="row">
+                <div class="col-md-2 left">
+                    <div class="router-box">
+                        <a class="router-box-item active" href="https://segmentfault.com/">
+                            <i class="fa fa-newspaper-o" aria-hidden="true"></i>
+                            <span class="name">为你推荐</span>
+                        </a>
+                        <a class="router-box-item " href="https://segmentfault.com/hottest">
+                            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                            <span class="name">近期热门</span>
+                        </a>
+                        <a class="router-box-item " href="https://segmentfault.com/newest">
+                            <i class="fa fa-globe" aria-hidden="true"></i>
+                            <span class="name">最新内容</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-7 middle">
+                    <div class="feed-option">
+                        <h5>为你推荐</h5>
+                    </div>
+
+                    <div class="news-list">
+                        {% for article in article_list %}
+                            <div class="news-item stream__item clearfix mt15 feed-option ">
+                                <div class="news__item-info clearfix">
+                                    <a href="" class="news-img"
+                                       style=""></a>
+                                    <a target="_blank" href="{% url 'Rehabilitation:article' article.id %}">
+                                        <div class="mb5 mt5">
+                                            <h4 class="">{{ article.title }}</h4>
+                                        </div>
+                                        <div class="article-excerpt">
+                                            {{ article.brief }}
+                                        </div>
+                                    </a>
+                                    <div class="news__item-meta">
+                                        <span class="votes-word">赞</span>
+                                        <span class="dot ">*</span>
+                                        <span class="votes-num  ">3</span>
+                                        <span class="pr20 votes-operation "></span>
+                                        <span class="author pr20">
+                                    <a href="{% url 'Rehabilitation:userProfile' article.author.nickname %}">{{ article.author.nickname }}</a>
+                                    <span class="dot">·</span>
+                                    今天 12:12
+                                </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 right">
+                    <div class="activity-recommend mb30">
+                        {#                        <a href="https://segmentfault.com/events" class="more-btn pull-right">更多</a>#}
+                        <div class="activity-title">活动推荐</div>
+                        {#                        <div class="activity-recommend-area">#}
+                        {#                            <a class="activity-recommend-item" href="https://segmentfault.com/e/1160000021828190">#}
+                        {#                                <div class="activity-date pull-left">#}
+                        {#                                    <div class="activity-date-wrapper">#}
+                        {#                                        <div class="activity-date-up">MAR</div>#}
+                        {#                                        <div class="activity-date-down">17</div>#}
+                        {#                                    </div>#}
+                        {#                                </div>#}
+                        {#                                <div class="activity-detail">#}
+                        {#                                    <div class="activity-detail-title">高校AI小程序战疫大赛</div>#}
+                        {#                                    <span class="activity-detail-base">北京</span><span class="dot">·</span>03-17&nbsp;&nbsp;周二<span#}
+                        {#                                        class="dot">·</span><span#}
+                        {#                                        class="activity-state">报名中</span>#}
+                        {#                                </div>#}
+                        {#                            </a>#}
+                        {#                        </div>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
