@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Rehabilitation.apps.RehabilitationConfig',
     'Hemophilia',
-    # 'channels',
+    'channels',
     'django_summernote',
 ]
 
@@ -88,6 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Hemophilia.wsgi.application'
+ASGI_APPLICATION = 'Hemophilia.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -96,11 +97,20 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hemophilia',
-        'USER': 'root',
-        'PASSWORD': '666666',
+        'USER': 'lujiusi',
+        'PASSWORD': 'blackRicardom4910',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": ["redis://127.0.0.1:6379/3"],
+        },
+    },
 }
 
 # Password validation
