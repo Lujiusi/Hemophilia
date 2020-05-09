@@ -1,5 +1,4 @@
 import json, time
-
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.contrib.auth import login, authenticate, logout
@@ -9,12 +8,13 @@ from django.views.generic.base import View
 from django.db.models import Q
 from django.shortcuts import render, HttpResponse, redirect, reverse
 from django.template.loader import render_to_string
+from django.utils import timezone
 from Rehabilitation import form
 from .models import *
 
 
 def index(request):
-    article_list = Article.objects.all()
+    article_list = Article.objects.filter(status="published")
     return render(request, 'Rehabilitation/index.html', locals())
 
 
@@ -61,7 +61,7 @@ class Login(View):
         else:
             login(request, user)
             res['status'] = '1'
-            return HttpResponse(json.dumps(res, ensure_ascii=False), content_type='application/json')
+        return HttpResponse(json.dumps(res, ensure_ascii=False), content_type='application/json')
 
 
 @login_required
@@ -83,7 +83,13 @@ def comment(request):
     if to_comment:
         new_comment.parent_comment = Comment.objects.filter(id=to_comment)[0]
     if new_comment.comment_type == '2':
-        Comment.objects.filter(comment_type="2", article=new_comment.article, user=request.user).delete()
+        like_comment = Comment.objects.filter(comment_type="2", article=new_comment.article, user=request.user)
+        print(like_comment)
+        if len(like_comment) > 0:
+            print(len(like_comment))
+            like_comment[0].delete()
+        else:
+            new_comment.save()
     else:
         new_comment.save()
     return redirect(reverse('Rehabilitation:article', kwargs={'articleId': article_id}))
@@ -112,13 +118,15 @@ def article(request, articleId):
             comment_list[comment].append(com)
     for comment, comment_list1 in comment_list.items():
         comment_list1.extend(findComment(comment_list1))
-    had_like = Comment.objects.filter(comment_type='2', user=request.user)
+    if request.user.is_authenticated:
+        had_like = Comment.objects.filter(comment_type='2', user=request.user, article__id=articleId)
     return render(request, 'Rehabilitation/article.html', locals())
 
 
 @login_required
 def write(request):
     article_Form = form.MessageForm
+    category_list = Category.objects.all()
     return render(request, 'Rehabilitation/write.html', locals())
 
 
@@ -129,6 +137,8 @@ class UserProfile(View):
         if request.user.is_authenticated:
             current_user = request.user
         u = User.objects.filter(username=username)[0]
+        pub_article = Article.objects.filter(author=u, status="published")
+        dra_article = Article.objects.filter(author=u, status="draft")
         return render(request, 'Rehabilitation/userProfile.html', locals())
 
     @staticmethod
@@ -145,25 +155,99 @@ class OperateArticle(View):
         article = Article()
         article.title = request.POST['title']
         article.brief = request.POST['brief']
+        article.category_id = request.POST['category']
         article.content = request.POST['article_from']
         article.status = request.POST['status']
         article.author = request.user
         article.category = Category.objects.filter(id='1')[0]
         article.priority = 1
         if article.status == 'published':
-            article.pub_date = time.time()
+            article.pub_date = timezone.now()
         else:
-            article.status = 'published'
+            article.status = 'draft'
+        article.last_modify = timezone.now()
         article.save()
         return redirect(reverse('Rehabilitation:article', kwargs={'articleId': article.id}))
 
 
+@login_required
 def messages(request):
-    return render(request, 'Rehabilitation/messages.html')
+    send_user = request.user
+    accept_user_id = request.GET.get('user_id')
+    if accept_user_id:
+        accept_user = User.objects.filter(username=accept_user_id)[0]
+        a = Conversation.objects.filter(send_user=send_user, accept_user=accept_user)
+        b = Conversation.objects.filter(send_user=accept_user, accept_user=send_user)
+        conv = None
+        if len(a) > 0:
+            conv = a[0]
+            conv.is_delete_by_sendPeople = False
+        elif len(b) > 0:
+            conv.is_delete_by_acceptPeople = False
+        else:
+            conv = Conversation.objects.create(send_user=send_user, accept_user=accept_user)
+        conv.save()
+        return redirect(reverse('Rehabilitation:conversation', kwargs={'convId': conv.id}))
+    else:
+        conversation_list = Conversation.objects.filter(
+            Q(send_user=send_user, is_delete_by_sendPeople=False) | Q(accept_user=send_user,
+                                                                      is_delete_by_acceptPeople=False))
+        return render(request, 'Rehabilitation/messages.html', locals())
 
 
+@login_required
+def sendMessage(request):
+    conv_id = request.POST.get('conv_id')
+    conv = Conversation.objects.filter(id=conv_id)[0]
+    current_user = request.user
+    another_user = get_other_user(current_user, conv)
+    message_detail = request.POST.get('message_detail')
+    conv.last_send_time = timezone.now()
+    conv.save()
+    mess = Massage.objects.create(conversation=conv, send_user=current_user, accept_user=another_user,
+                                  msg_detail=message_detail)
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)("abc%s" % another_user.id,
+                                            generate_payload(another_user, conv, mess))
+    async_to_sync(channel_layer.group_send)("abc%s" % current_user.id,
+                                            generate_payload(current_user, conv, mess))
+    res = dict(is_success=True)
+    return HttpResponse(json.dumps(res, ensure_ascii=False), content_type='application/json')
+
+
+@login_required
 def conversation(request, convId):
-    return render(request, 'Rehabilitation/conversation.html')
+    current_user = request.user
+    another_user = None
+    conv = Conversation.objects.filter(id=convId)[0]
+    if conv.send_user == current_user:
+        another_user = conv.accept_user
+    else:
+        another_user = conv.send_user
+    conv_list = Massage.objects.filter(conversation=conv)
+    return render(request, 'Rehabilitation/conversation.html', locals())
+
+
+@login_required
+def delete_conversation(request):
+    conv_id = request.GET.get('conv_id')
+    current_user = request.user
+    conv = Conversation.objects.filter(id=conv_id)[0]
+    if current_user == conv.send_user:
+        conv.is_delete_by_sendPeople = True
+    else:
+        conv.is_delete_by_acceptPeople = True
+    conv.save()
+    return redirect(reverse('Rehabilitation:messages'))
+
+
+@login_required
+def shield_user(request, convId):
+    conv = Conversation.objects.filter(id=convId)[0]
+    current_user = request.user
+    other_user = get_other_user(current_user, conv)
+    Blacklist.objects.create(master_user=current_user, black_user=other_user)
+    return redirect(reverse('Rehabilitation:messages'))
 
 
 def findComment(comment_list):
@@ -176,3 +260,55 @@ def findComment(comment_list):
         if len(com_list1) > 0:
             com_list.extend(findComment(com_list1))
     return com_list
+
+
+@login_required
+def modify_profile(request):
+    current_user = request.user
+    fieldname = request.POST.get('name')
+    fieldvalue = request.POST.get('value')
+    if fieldname == 'nickname':
+        current_user.nickname = fieldvalue
+    elif fieldname == 'gender':
+        current_user.gender = fieldvalue
+    elif fieldname == 'realname':
+        current_user.realname = fieldvalue
+    elif fieldname == 'mail':
+        current_user.email = fieldvalue
+    elif fieldname == 'phone':
+        current_user.phone = fieldvalue
+    elif fieldname == 'city':
+        current_user.city = fieldvalue
+    elif fieldname == 'signature':
+        current_user.signature = fieldvalue
+    current_user.save()
+    return HttpResponse(json.dumps({}, ensure_ascii=False), content_type='application/json')
+
+
+def get_other_user(current_user, current_conv):
+    if current_user == current_conv.send_user:
+        other_user = current_conv.accept_user
+    else:
+        other_user = current_conv.send_user
+    return other_user
+
+
+def generate_payload(user, conv, message_detail):
+    payload = {
+        'type': 'receive',
+        'massage': render_to_string('Rehabilitation/simple_message.html',
+                                    {'message_detail': generate_msg(message_detail)}),
+    }
+    return payload
+
+
+def generate_msg(message_detail):
+    msg = []
+    msg.append(message_detail.send_user.nickname)
+    msg.append(message_detail.send_date)
+    msg.append(message_detail.msg_detail)
+    return msg
+
+
+def test(request):
+    return render(request, 'Rehabilitation/test.html')

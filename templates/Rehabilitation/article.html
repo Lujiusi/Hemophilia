@@ -20,15 +20,15 @@
                             <h1 class="h2 mb-3" id="sf-article_title">
                                 <a class="text-body">{{ art.title }}</a>
                             </h1>
-                            <a href="{% url 'Rehabilitation:comment' %}?article_id={{ art.id }}">
+                            <a>
                                 {% if had_like|length < 1 %}
                                     <button class="btn btn-primary pull-right mt15" value="{{ art.id }}"
-                                            post_to="{% url 'Rehabilitation:comment' %}" onclick="like(this)">点赞
+                                            comment_url="{% url 'Rehabilitation:comment' %}" onclick="like(this)">点赞
                                     </button>
                                 {% else %}
                                     <button class="btn btn-primary pull-right mt15" value="{{ art.id }}"
                                             style="background-color: red"
-                                            post_to="{% url 'Rehabilitation:comment' %}" onclick="like(this)">已赞
+                                            comment_url="{% url 'Rehabilitation:comment' %}" onclick="like(this)">已赞
                                     </button>
                                 {% endif %}
                             </a>
@@ -36,7 +36,7 @@
                                 <a class="text-body" href=""></a>
                             </h1>
                             <a class="text-body">作者 ：<a
-                                    href="{% url 'Rehabilitation:userProfile' art.author.nickname %}">{{ art.author.nickname }}</a></a>
+                                    href="{% url 'Rehabilitation:userProfile' art.author.username %}">{{ art.author.nickname }}</a></a>
                             <h1 class="h2 mb-3" id="sf-article_title">
                                 <a class="text-body" href=""></a>
                             </h1>
@@ -82,7 +82,7 @@
                                     </div>
                                     <div class="media-body">
                                         <div>
-                                            <a href="{% url 'Rehabilitation:userProfile' comment.user.nickname %}"><strong>{{ comment.user.nickname }}</strong></a>
+                                            <a href="{% url 'Rehabilitation:userProfile' comment.user.username %}"><strong>{{ comment.user.nickname }}</strong></a>
                                             <span class="text-muted pull-right">{{ comment.date }}</span>
                                         </div>
                                         <div class="clearfix">

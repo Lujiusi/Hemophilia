@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <style>
+        .user_avatar_file {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            margin-left: 15px;
+
+        }
+
+        .user_avatar_thumbnail {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+<div class="form-group">
+    <label for="user_avatar" class="col-md-3 control-label">头像</label>
+    <div class="col-sm-offset-3 col-md-9">
+        <img src="/static/userpic/1945964498-5e567822ac9b7_big64.png" alt="" id="user_avatar_thumbnail"
+             style="width:100px;height:60px" class="user_avatar_thumbnail">
+        <input type="file" class="user_avatar_file" id="user_avatar_file" style="height: 60px;width: 100px">
+    </div>
+</div>
+</body>
+<script>
+    $('#user_avatar_file').change(function () {
+        var file = this.files[0];
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            $('#user_avatar_thumbnail')[0].src = this.result
+        }
+    });
+</script>
+</html>

@@ -81,11 +81,6 @@ function checkPassword(e) {
     let thisPassword = $(e).val()
 }
 
-// function editProfile(e) {
-//     $(e).parent().css('display', 'none');
-//     $(e).parent().next().css('display', 'block');
-// }
-
 function sendProfile(e) {
     let name = $(e).attr('name');
     let value = $(":input[name=" + name + "]").val();
@@ -103,6 +98,13 @@ function sendProfile(e) {
                 break;
         }
     }
+    let url = $('#modify_user').attr('post_to')
+    $.post(url, {
+        'name': name,
+        'value': value,
+        'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val()
+    }, function (event) {
+    })
     $(e).parent().attr('value', '').css('display', 'none');
     $(e).parent().prev().css('display', 'block');
     $(e).parent().prev().children('span:first-child').children('span:last-child').text(value);
@@ -121,8 +123,15 @@ function editSignature(e) {
 function sendSignature(e) {
     let signatureEditor = $(e).parent().parent().parent();
     let signature = signatureEditor.find('textarea').val();
+    let url = $('#modify_user').attr('post_to')
+    $.post(url, {
+        'name': 'signature',
+        'value': signature,
+        'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val()
+    }, function (event) {
+    })
     signatureEditor.css('display', 'none');
-    signatureEditor.prev().css('display', 'block').text(signature);
+    signatureEditor.prev().css('display', 'block').children('p:first-child').text(signature);
 }
 
 function editSignatureCancel(e) {
@@ -144,12 +153,12 @@ function cancelComment(e) {
 
 function like(e) {
     let article_id = $(e).val();
-    let url = $(e).attr('post_to');
-    // $.post(url,
-    //     {'article_id': article_id},
-    //     function (callback) {
-    //
-    //     });
+    let url = $(e).attr('comment_url');
+    $.post(url,
+        {'article_id': article_id, 'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val()},
+        function (callback) {
+            console.log(callback)
+        });
     if ($(e).text() === '已赞') {
         $(e).css('background-color', '#337ab7');
         $(e).text('点赞');
@@ -160,13 +169,28 @@ function like(e) {
 }
 
 function articleSubmit(e) {
-    if ($(e).attr('name') === 'public') {
+    if ($(e).attr('name') === 'published') {
         $("form[class='article-form']").append('<input name="status" value="published">').submit();
         alert('发布')
     } else {
         $("form[class='article-form']").append('<input name="status" value="draft">').submit();
         alert('保存')
     }
+}
+
+function sendMessage(e) {
+    mes = $('#messageMessage').val()
+    url = $(e).attr('post_to')
+    conv_id = $(e).attr('conv_id')
+    $.post(url,
+        {
+            'conv_id': conv_id,
+            'message_detail': mes,
+            'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val()
+        },
+        function (callback) {
+            console.log(callback)
+        })
 }
 
 function sendComment(e) {

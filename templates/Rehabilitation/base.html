@@ -35,7 +35,8 @@
             {% else %}
                 <div class="col-sm-4 col-md-3 col-lg-3 text-right">
                     <ul class="opts list-inline hidden-xs">
-                        <li class="menu__item"><a href="">消息<span class="has-unread__count">1</span></a>
+                        <li class="menu__item"><a href="{% url 'Rehabilitation:messages' %}">消息<span
+                                class="has-unread__count">1</span></a>
                         </li>
                         <li class="opts__item user dropdown hoverDropdown ml0">
                             <a class="avatar-* dropdownBtn user-avatar" data-toggle="dropdown"
@@ -55,6 +56,7 @@
 {% block body %}
 
 {% endblock %}
+
 <div class="sfmodal modal" id="register" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"
      style="display: none;">
     <div class="modal-dialog ">

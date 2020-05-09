@@ -128,6 +128,7 @@ class Conversation(models.Model):
     # 此处不好,每当这个会话中添加新的session 此两处被重置为false;
     is_delete_by_sendPeople = models.BooleanField(default=False)
     is_delete_by_acceptPeople = models.BooleanField(default=False)
+    last_send_time = models.DateTimeField(auto_now=True)
     creation_time = models.DateTimeField(null=False, auto_now=True)
 
     def __str__(self):

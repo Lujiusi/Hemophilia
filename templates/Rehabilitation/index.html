@@ -1,5 +1,7 @@
 {% extends 'Rehabilitation/base.html' %}
 
+{% load mytags %}
+
 {% block title %}血友阳光{% endblock %}
 
 {% block body %}
@@ -7,20 +9,20 @@
         <div class="container mt30">
             <div class="row">
                 <div class="col-md-2 left">
-                    <div class="router-box">
-                        <a class="router-box-item active" href="https://segmentfault.com/">
-                            <i class="fa fa-newspaper-o" aria-hidden="true"></i>
-                            <span class="name">为你推荐</span>
-                        </a>
-                        <a class="router-box-item " href="https://segmentfault.com/hottest">
-                            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-                            <span class="name">近期热门</span>
-                        </a>
-                        <a class="router-box-item " href="https://segmentfault.com/newest">
-                            <i class="fa fa-globe" aria-hidden="true"></i>
-                            <span class="name">最新内容</span>
-                        </a>
-                    </div>
+                    {#                    <div class="router-box">#}
+                    {#                        <a class="router-box-item active" href="https://segmentfault.com/">#}
+                    {#                            <i class="fa fa-newspaper-o" aria-hidden="true"></i>#}
+                    {#                            <span class="name">为你推荐</span>#}
+                    {#                        </a>#}
+                    {#                        <a class="router-box-item " href="https://segmentfault.com/hottest">#}
+                    {#                            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>#}
+                    {#                            <span class="name">近期热门</span>#}
+                    {#                        </a>#}
+                    {#                        <a class="router-box-item " href="https://segmentfault.com/newest">#}
+                    {#                            <i class="fa fa-globe" aria-hidden="true"></i>#}
+                    {#                            <span class="name">最新内容</span>#}
+                    {#                        </a>#}
+                    {#                    </div>#}
                 </div>
 
                 <div class="col-md-7 middle">
@@ -45,12 +47,12 @@
                                     <div class="news__item-meta">
                                         <span class="votes-word">赞</span>
                                         <span class="dot ">*</span>
-                                        <span class="votes-num  ">3</span>
+                                        <span class="votes-num  ">{% likeCount article %}</span>
                                         <span class="pr20 votes-operation "></span>
                                         <span class="author pr20">
-                                    <a href="{% url 'Rehabilitation:userProfile' article.author.nickname %}">{{ article.author.nickname }}</a>
+                                    <a href="{% url 'Rehabilitation:userProfile' article.author.username %}">{{ article.author.nickname }}</a>
                                     <span class="dot">·</span>
-                                    今天 12:12
+                                    {{ article.pub_date }}
                                 </span>
                                     </div>
                                 </div>
@@ -85,6 +87,4 @@
             </div>
         </div>
     </div>
-
-
 {% endblock %}

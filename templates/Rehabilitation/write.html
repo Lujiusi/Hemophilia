@@ -27,14 +27,22 @@
             <div class="form-group">
                 <input class="form-control form-control-lg" name="brief" placeholder="请输入简介" type="text">
             </div>
+            <div class="form-group form form--profile form-inline">
+                <select class="form-control form-control-lg" name="category">
+                    {% for category in category_list %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             {{ article_Form }}
             <div class="col-sm-4 col-md-3 col-lg-3">
                 <ul class="opts list-inline hidden-xs">
                     <li class="menu__item">
-                        <button class="btn btn-primary btn-block" onclick="articleSubmit(this)">保存</button>
+                        <button class="btn btn-primary btn-block" onclick="articleSubmit(this)" name="drift">保存</button>
                     </li>
                     <li class="menu__item">
-                        <button class="btn btn-primary btn-block" onclick="articleSubmit(this)">发布
+                        <button class="btn btn-primary btn-block" onclick="articleSubmit(this)" name="published">发布
                         </button>
                     </li>
                 </ul>

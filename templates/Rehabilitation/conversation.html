@@ -1,162 +1,90 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <title>血友阳光</title>
-    <link rel="shortcut icon" href="/static/img/Hemophilia.png">
-    <link rel="stylesheet" href="/static/css/global.css">
-    <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="/static/css/responsive.css">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <script type="text/javascript" async="" src="/static/js/analytics.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.js"></script>
-    <script type="text/javascript" src="/static/js/main.js"></script>
-</head>
-<body data-mod="index" class="index-index ">
-<div class="global-nav sf-header sf-header--index">
-    <nav class="container nav">
-        <div class="row hidden-xs hidden-sm">
-            <div class="col-sm-8 col-md-9 col-lg-9">
-                <ul class="menu list-inline pull-left hidden-xs">
-                    <li class="menu__item"><a href="" class="active-nav">首页</a></li>
-                    <li class="menu__item"><a href="" class="">问答</a></li>
-                    <li class="menu__item"><a href="" class="">专栏</a></li>
-                    <li class="menu__item"><a href="" class="">课程</a></li>
-                    <li class="menu__item"><a href="" class="">活动</a></li>
-                </ul>
-            </div>
+{% extends 'Rehabilitation/base.html' %}
 
-            <div class="col-sm-4 col-md-3 col-lg-3 text-right">
-                <ul class="opts list-inline hidden-xs">
-                    <li class="menu__item">
-                        <button class="btn" onclick="loginOrRegister(this)" value="login">登录</button>
-                    </li>
-                    <li class="menu__item">
-                        <button class="btn" onclick="loginOrRegister(this)" value="register">注册</button>
-                    </li>
-                </ul>
-            </div>
-            {#            <div class="col-sm-4 col-md-3 col-lg-3 text-right">#}
-            {#                <ul class="opts list-inline hidden-xs">#}
-            {#                    <li class="menu__item"><a href="">消息<span class="has-unread__count">1</span></a>#}
-            {#                    </li>#}
-            {#                    <li class="opts__item user dropdown hoverDropdown ml0">#}
-            {#                        <a class="avatar-* dropdownBtn user-avatar" data-toggle="dropdown"#}
-            {#                           style="background-image: url('/static/userpic/1945964498-5e567822ac9b7_big64.png')"#}
-            {#                           href=""></a>#}
-            {#                    </li>#}
-            {#                    <li class="menu__item"><a href="">登出</a></li>#}
-            {#                </ul>#}
-            {#            </div>#}
-        </div>
-    </nav>
-</div>
+{% block title %}血友阳光{% endblock %}
 
-<div class="container pt30">
+{% block static %}
+    <script type="text/javascript" src="/static/js/reconnecting-websocket.js"></script>
+{% endblock %}
 
-    <div class="row">
-        <div class="col-xs-12 col-md-9 main">
-            <div class="clearfix mt15">
-                <a href="/user/messages" class="pull-left btn btn-default btn-xs">← 返回列表</a>
-                <button id="unBlockUser" data-userid="1030000021849140" data-username="丁皖"
-                        class="hidden pull-right btn btn-default btn-xs ml10">已屏蔽该用户
-                </button>
-                <button id="blockUser" data-userid="1030000021849140" data-username="丁皖"
-                        class="pull-right btn btn-default btn-xs ml10">屏蔽用户
-                </button>
-                <button id="delInbox" data-userid="1030000021849140" data-username="丁皖"
-                        class="pull-right btn btn-default btn-xs">删除对话
-                </button>
-            </div>
+{% block body %}
+    <div class="container pt30">
+        <div class="row">
+            <div class="col-xs-12 col-md-9 main">
+                <div class="clearfix mt15">
+                    <a href="{% url 'Rehabilitation:messages' %}" class="pull-left btn btn-default btn-xs">← 返回列表</a>
+                    <a href="{% url 'Rehabilitation:messages' %}"
+                       class="pull-right btn btn-default btn-xs ml10">屏蔽用户</a>
+                    <a href="{% url 'Rehabilitation:deleteConversation' %}?conv_id={{ convId }}"
+                       class="pull-right btn btn-default btn-xs ml10">删除会话</a>
+                    {#                    <button id="blockUser"#}
+                    {#                            class="pull-right btn btn-default btn-xs ml10">屏蔽用户#}
+                    {#                    </button>#}
+                    {#                    <button id="delInbox"#}
+                    {#                            class="pull-right btn btn-default btn-xs">删除对话#}
+                    {#                    </button>#}
+                </div>
 
-            <div class="stream-list border-top mt15">
-                <div class="mt15 mr10 ">
-                    <div class="media-left pull-left ml10">
-                        <a href="/static/img/人工智能.png"></a>
+                <div class="stream-list border-top mt15">
+                    <div class="mt15 mr10 ">
+                        <div class="media-left pull-left ml10">
+                            <a href="/static/img/人工智能.png"></a>
+                        </div>
+                        <form class="mt15 mb15 messageForm clearfix mr10">
+                            <p class="mb7"><strong>发私信给 <a target="_blank"
+                                                           href="{% url 'Rehabilitation:userProfile' another_user.username %}">{{ another_user.nickname }}</a>：</strong>
+                            </p>
+                            {#                            <input id="messageReceiver" type="hidden" name="receiver" value="1030000021849140">#}
+                            <textarea class="form-control" id="messageMessage"
+                                      placeholder="仅支持纯文本，不超过 1024 字"></textarea>
+                            <button class="btn btn-primary pull-right mt15" id="sendMsg" conv_id="{{ convId }}"
+                                    onclick="sendMessage(this)" post_to= {% url 'Rehabilitation:sendMessage' %}>
+                                发送
+                            </button>
+                        </form>
+                        <hr class="mt15 mb0">
                     </div>
-                    <form action="/api/message/send" method="POST" class="mt15 mb15 messageForm clearfix mr10">
-                        <p class="mb7"><strong>发私信给 <a target="_blank" href="/u/dingwan">丁皖</a>：</strong></p>
-                        <input id="messageReceiver" type="hidden" name="receiver" value="1030000021849140">
-                        <textarea class="form-control" id="messageMessage" placeholder="仅支持纯文本，不超过 1024 字"></textarea>
-                        <button class="btn btn-primary pull-right mt15" id="sendMsg" data-userid="1030000021849140">发送
-                        </button>
-                    </form>
-                    <hr class="mt15 mb0">
-                </div>
+                    <div id="messages">
+                        {% for conv in conv_list %}
+                            <section class="stream-list__item  mr10">
+                                <div class="media">
+                                    <div class="media-left pull-left">
+                                        <a href="{% url 'Rehabilitation:userProfile' conv.send_user.username %}"><img
+                                                class="avatar-40"
+                                                src="/static/img/人工智能.png"></a>
+                                    </div>
+                                    <div class="media-body">
+                                        <div>
+                                            <a href="{% url 'Rehabilitation:userProfile' conv.send_user.username %}"><strong>{{ conv.send_user.nickname }}</strong></a>
+                                            <span class="text-muted pull-right">{{ conv.send_date }}</span>
+                                        </div>
+                                        <div class="clearfix">
+                                            <p class="col-xs-11 pull-left text-muted mb0 fmt p-l-0">
+                                                {{ conv.msg_detail }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        {% endfor %}
+                    </div>
 
+                </div><!-- /.stream-list -->
 
-                <div id="messages">
-                    <section class="stream-list__item  mr10" id="msg-1440000021859996">
-                        <div class="media">
-                            <div class="media-left pull-left">
-                                <a href="/u/dingwan"><img class="avatar-40"
-                                                          src="/static/img/人工智能.png"></a>
-                            </div>
-                            <div class="media-body">
-                                <div>
-                                    <a href="/u/dingwan"><strong>丁皖</strong></a>
-                                    <span class="text-muted pull-right">2月27日</span>
-                                </div>
-                                <div class="clearfix">
-                                    <p class="col-xs-11 pull-left text-muted mb0 fmt p-l-0">
-                                        我是你的粉丝
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    <section class="stream-list__item  mr10" id="msg-1440000021859996">
-                        <div class="media">
-                            <div class="media-left pull-left">
-                                <a href="/u/dingwan"><img class="avatar-40"
-                                                          src="/static/img/人工智能.png"></a>
-                            </div>
-                            <div class="media-body">
-                                <div>
-                                    <a href="/u/dingwan"><strong>丁皖</strong></a>
-                                    <span class="text-muted pull-right">2月27日</span>
-                                </div>
-                                <div class="clearfix">
-                                    <p class="col-xs-11 pull-left text-muted mb0 fmt p-l-0">
-                                        在吗
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    <section class="stream-list__item  mr10" id="msg-1440000021859996">
-                        <div class="media">
-                            <div class="media-left pull-left">
-                                <a href="/u/dingwan"><img class="avatar-40"
-                                                          src="/static/img/人工智能.png"></a>
-                            </div>
-                            <div class="media-body">
-                                <div>
-                                    <a href="/u/dingwan"><strong>丁皖</strong></a>
-                                    <span class="text-muted pull-right">2月27日</span>
-                                </div>
-                                <div class="clearfix">
-                                    <p class="col-xs-11 pull-left text-muted mb0 fmt p-l-0">
-                                        你好
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-            </div><!-- /.stream-list -->
-
-        </div><!-- /.main -->
-        <div class="col-md-3"></div>
-    </div>
-</div>
-<footer id="footer">
-    <div class="container">
-        <div class="copyright">
-            Copyright © 2019-2020<br>
+            </div><!-- /.main -->
+            <div class="col-md-3"></div>
         </div>
     </div>
-</footer>
 
-</body>
-</html>
+    <script>
+        $(document).ready(function () {
+            const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+            const ws_path = ws_scheme + "://" + window.location.host + "/" + "ws" + "/" + "abc" + "{{ current_user.id }}" + "/";
+            const ws = new ReconnectingWebSocket(ws_path);
+            ws.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                console.log(data['massage'])
+                $('#messages').prepend(data['massage'])
+            }
+        })
+    </script>
+{% endblock %}
