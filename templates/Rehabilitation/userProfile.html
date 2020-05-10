@@ -6,6 +6,15 @@
 
 {% block static %}
     <link rel="stylesheet" href="/static/css/user.css">
+    <script src="/static/js/jquery.min.js"></script>
+
+    {#    <link href="/static/css/bootstrap.min.css" rel="stylesheet">#}
+    <link href="/static/css/cropper.min.css" rel="stylesheet">
+    <link href="/static/css/sitelogo.css" rel="stylesheet">
+
+    <script src="/static/js/cropper.min.js"></script>
+    <script src="/static/js/sitelogo.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -13,12 +22,13 @@
         <header class="profile__heading">
             <div class="container">
                 <div class="row" style="position: relative;">
-                    <div class="col-md-2 col-sm-3 col-xs-3">
-                        <div class="profile__heading--avatar-warp"><a href=""><img
-                                class="profile__heading--avatar avatar-160"
-                                src="https://avatar-static.segmentfault.com/194/596/1945964498-5e567822ac9b7_huge256"
-                                alt="九思"></a><input type="file" id="avatarFile" name="avatar" class="file hide">
-                            <div class="profile__avatar-uploader"><span>上传头像</span></div>
+                    <div id="crop-avatar" class="col-md-2 col-sm-3 col-xs-3">
+                        <div class="avatar-view profile__heading--avatar-warp ">
+                            <img
+                                    class="profile__heading--avatar avatar-160"
+                                    src="{% fixPath current_user.avatar %}"
+                                    alt="userpic">
+                            {#                            <div class="profile__avatar-uploader"><span>上传头像</span></div>#}
                         </div>
                         {% if current_user and not u.username == current_user.username %}
                             <div class="profile__heading--social">
@@ -164,10 +174,12 @@
                                 class="profile__heading-dot profile__heading-dot--yellow"></span><span
                                 class="profile__heading-dot profile__heading-dot--green"></span></span>
                             <div class="pull-right">
-                            <span data-type="desc" class="profile__heading-edit" onclick="editSignature(this)">
-                                <i class="fa fa-pencil" aria-hidden="true"></i>
-                                编辑
-                            </span>
+                                {% if current_user and  u.username == current_user.username %}
+                                    <span data-type="desc" class="profile__heading-edit" onclick="editSignature(this)">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    编辑
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="profile__heading--desc-body">
@@ -284,6 +296,61 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="avatar-modal" aria-hidden="true" aria-labelledby="avatar-modal-label" role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="avatar-form" action="{% url 'Rehabilitation:userPic' %}" enctype="multipart/form-data"
+                      method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal" type="button">&times;</button>
+                        <h4 class="modal-title" id="avatar-modal-label">更换头像</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="avatar-body">
+                            <div class="avatar-upload">
+                                <input class="avatar-src" name="avatar_src" type="hidden">
+                                <input class="avatar-data" name="avatar_data" type="hidden">
+                                <label for="avatarInput">图片上传</label>
+                                <input class="avatar-input" id="avatarInput" name="avatar_file" type="file"></div>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <div class="avatar-wrapper"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="avatar-preview preview-lg"></div>
+                                    <div class="avatar-preview preview-md"></div>
+                                    <div class="avatar-preview preview-sm"></div>
+                                </div>
+                            </div>
+                            <div class="row avatar-btns">
+                                <div class="col-md-9">
+                                    <div class="btn-group">
+                                        <button class="btn" data-method="rotate" data-option="-90" type="button"
+                                                title="Rotate -90 degrees"><i class="fa fa-undo"></i> 向左旋转
+                                        </button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn" data-method="rotate" data-option="90" type="button"
+                                                title="Rotate 90 degrees"><i class="fa fa-repeat"></i> 向右旋转
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-success btn-block avatar-save" type="submit"><i
+                                            class="fa fa-save"></i> 保存修改
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             if ("{{ u.gender }}" === "男") {

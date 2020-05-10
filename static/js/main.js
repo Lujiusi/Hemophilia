@@ -189,7 +189,11 @@ function sendMessage(e) {
             'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val()
         },
         function (callback) {
-            console.log(callback)
+            if (callback['is_success']) {
+                console.log(callback)
+            } else {
+                alert('宁已被对方拉入黑名单')
+            }
         })
 }
 

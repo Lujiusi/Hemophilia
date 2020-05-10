@@ -1,16 +1,19 @@
-import json, time
+import json
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.views.generic.base import View
 from django.db.models import Q
 from django.shortcuts import render, HttpResponse, redirect, reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from Rehabilitation import form
+from PIL import Image
 from .models import *
+from io import BytesIO
 
 
 def index(request):
@@ -26,7 +29,7 @@ class Register(View):
         r.username = request.POST['username']
         r.password = request.POST['password']
         r.realname = request.POST.get('realname', '')
-        r.nickname = request.POST.get('nickname', '')
+        r.nickname = request.POST.get('nickname', r.username)
         r.avatar = request.FILES.get('avatar', None)
         r.gender = request.POST.get('gender', '')
         r.phone = request.POST.get('phone', '')
@@ -137,6 +140,7 @@ class UserProfile(View):
         if request.user.is_authenticated:
             current_user = request.user
         u = User.objects.filter(username=username)[0]
+        print(u.avatar)
         pub_article = Article.objects.filter(author=u, status="published")
         dra_article = Article.objects.filter(author=u, status="draft")
         return render(request, 'Rehabilitation/userProfile.html', locals())
@@ -201,17 +205,20 @@ def sendMessage(request):
     conv = Conversation.objects.filter(id=conv_id)[0]
     current_user = request.user
     another_user = get_other_user(current_user, conv)
-    message_detail = request.POST.get('message_detail')
-    conv.last_send_time = timezone.now()
-    conv.save()
-    mess = Massage.objects.create(conversation=conv, send_user=current_user, accept_user=another_user,
-                                  msg_detail=message_detail)
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)("abc%s" % another_user.id,
-                                            generate_payload(another_user, conv, mess))
-    async_to_sync(channel_layer.group_send)("abc%s" % current_user.id,
-                                            generate_payload(current_user, conv, mess))
-    res = dict(is_success=True)
+    if len(Blacklist.objects.filter(master_user=another_user, black_user=current_user)) < 1:
+        message_detail = request.POST.get('message_detail')
+        conv.last_send_time = timezone.now()
+        conv.save()
+        mess = Massage.objects.create(conversation=conv, send_user=current_user, accept_user=another_user,
+                                      msg_detail=message_detail)
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)("abc%s" % another_user.id,
+                                                generate_payload(current_user, mess))
+        async_to_sync(channel_layer.group_send)("abc%s" % current_user.id,
+                                                generate_payload(current_user, mess))
+        res = dict(is_success=True)
+    else:
+        res = dict(is_success=False)
     return HttpResponse(json.dumps(res, ensure_ascii=False), content_type='application/json')
 
 
@@ -293,22 +300,55 @@ def get_other_user(current_user, current_conv):
     return other_user
 
 
-def generate_payload(user, conv, message_detail):
+def generate_payload(user, message_detail):
     payload = {
         'type': 'receive',
         'massage': render_to_string('Rehabilitation/simple_message.html',
-                                    {'message_detail': generate_msg(message_detail)}),
+                                    {'message_detail': message_detail, 'current_user': user}),
     }
     return payload
 
 
-def generate_msg(message_detail):
-    msg = []
-    msg.append(message_detail.send_user.nickname)
-    msg.append(message_detail.send_date)
-    msg.append(message_detail.msg_detail)
-    return msg
-
-
 def test(request):
     return render(request, 'Rehabilitation/test.html')
+
+
+class UserPic(View):
+
+    @staticmethod
+    @login_required
+    def post(request):
+        file = request.FILES['avatar_file']
+        data = request.POST['avatar_data']
+        img = crop_image(file, data)
+        current_user = request.user
+        current_user.avatar = img
+        current_user.save()
+
+        return HttpResponse(json.dumps({'result': True}, ensure_ascii=False), content_type='application/json')
+
+
+def crop_image(file, data):
+    coords = json.loads(data)
+    t_x = int(coords['x'])
+    t_y = int(coords['y'])
+    t_width = t_x + int(coords['width'])
+    t_height = t_y + int(coords['height'])
+    t_rotate = coords['rotate']
+
+    # 裁剪图片,压缩尺寸为400*400。
+    img = Image.open(file)
+    crop_im = img.crop((t_x, t_y, t_width, t_height)).resize((400, 400), Image.ANTIALIAS).rotate(t_rotate)
+
+    pic_io = BytesIO()
+    crop_im.save(pic_io, img.format)
+    crop_im = InMemoryUploadedFile(
+        file=pic_io,
+        field_name=None,
+        name=file.name,
+        content_type=None,
+        size=crop_im.size,
+        charset=None
+    )
+
+    return crop_im

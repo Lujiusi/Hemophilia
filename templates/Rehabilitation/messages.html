@@ -16,17 +16,17 @@
                             <div style="cursor:pointer" onmouseover="this.style.backgroundColor='#F4F9FD'"
                                  onmouseout="this.style.backgroundColor='#FFFFFF'"
                                  onclick="window.open('{% url 'Rehabilitation:conversation' 1 %}')">
+                                {% anotherPeople request.user conversation as anotherOne %}
                                 <section class="stream-list__item">
-
                                     <div class="media">
                                         <div class="media-left pull-left">
                                             <a href="">
                                                 <img class="avatar-40"
-                                                     src="/static/img/人工智能.png"></a>
+                                                     src="{% fixPath anotherOne.avatar %}"></a>
                                         </div>
                                         <div class="media-body">
                                             <div>
-                                                <a href=""><strong>{% anotherName request.user conversation %}</strong></a>
+                                                <a href=""><strong>{{ anotherOne.nickname }}</strong></a>
                                                 <span class="text-muted pull-right">{{ conversation.last_send_time }}</span>
                                             </div>
                                             <p class="pull-left text-muted mb0 ellipsis">

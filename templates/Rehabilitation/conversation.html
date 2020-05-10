@@ -1,5 +1,7 @@
 {% extends 'Rehabilitation/base.html' %}
 
+{% load mytags %}
+
 {% block title %}血友阳光{% endblock %}
 
 {% block static %}
@@ -50,7 +52,7 @@
                                     <div class="media-left pull-left">
                                         <a href="{% url 'Rehabilitation:userProfile' conv.send_user.username %}"><img
                                                 class="avatar-40"
-                                                src="/static/img/人工智能.png"></a>
+                                                src="{% fixPath conv.send_user.avatar %}"></a>
                                     </div>
                                     <div class="media-body">
                                         <div>

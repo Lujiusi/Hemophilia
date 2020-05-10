@@ -1,7 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-import datetime
+import datetime, uuid
 from django.core.exceptions import ValidationError
+
+
+def upload_to(instance, filename):
+    ext = filename.split('.')
+    return 'userpic/' + uuid.uuid4().hex + '.' + ext[len(ext) - 1].lower()
 
 
 # Create your models here.
@@ -15,7 +20,8 @@ class User(AbstractUser):
     # 用户表 用户信息 用户名 用户签名 用户头像
     nickname = models.CharField(verbose_name='昵称', max_length=32)
     signature = models.CharField(verbose_name='签名', max_length=255, blank=True, null=True)
-    avatar = models.ImageField(verbose_name='用户头像', blank=True, upload_to='static/userpic')
+    avatar = models.ImageField(verbose_name='用户头像', blank=True, upload_to=upload_to,
+                               default='/media/userpic/default.jpg')
     realname = models.CharField(verbose_name='姓名', max_length=32, default='', null=True)
     gender = models.CharField(verbose_name='性别', max_length=10, choices=(('男', '男'), ('女', '女')), default='男')
     phone = models.CharField(verbose_name='手机号码', max_length=64, default='', null=True)

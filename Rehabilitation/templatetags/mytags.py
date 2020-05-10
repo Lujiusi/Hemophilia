@@ -17,6 +17,14 @@ def genderJudge(gender, value):
 
 
 @register.simple_tag
+def anotherPeople(current_user, conversation):
+    if current_user == conversation.send_user:
+        return conversation.accept_user
+    else:
+        return conversation.send_user
+
+
+@register.simple_tag
 def anotherName(current_user, conversation):
     if current_user == conversation.send_user:
         return conversation.accept_user.nickname
@@ -32,3 +40,8 @@ def likeCount(article):
 @register.simple_tag
 def commentCount(article):
     return len(Comment.objects.filter(article=article, comment_type=1))
+
+
+@register.simple_tag
+def fixPath(avatar):
+    return "/media/%s" % (avatar)

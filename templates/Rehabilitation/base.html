@@ -12,6 +12,7 @@
     {% block static %}{% endblock %}
     {% csrf_token %}
 </head>
+{% load mytags %}
 <body data-mod="index" class="index-index ">
 <div class="global-nav sf-header sf-header--index">
     <nav class="container nav">
@@ -40,7 +41,7 @@
                         </li>
                         <li class="opts__item user dropdown hoverDropdown ml0">
                             <a class="avatar-* dropdownBtn user-avatar" data-toggle="dropdown"
-                               style="background-image: url('/static/userpic/1945964498-5e567822ac9b7_big64.png')"
+                               style="background-image: url('{% fixPath request.user.avatar %}')"
                                href="{% url 'Rehabilitation:userProfile' request.user.username %}"></a>
                         </li>
                         <li class="menu__item"><a
