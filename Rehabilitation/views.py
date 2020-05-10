@@ -180,6 +180,9 @@ def messages(request):
     accept_user_id = request.GET.get('user_id')
     if accept_user_id:
         accept_user = User.objects.filter(username=accept_user_id)[0]
+        isShield = Blacklist.objects.filter(master_user=send_user, black_user=accept_user)
+        if len(isShield) > 0:
+            isShield[0].delete()
         a = Conversation.objects.filter(send_user=send_user, accept_user=accept_user)
         b = Conversation.objects.filter(send_user=accept_user, accept_user=send_user)
         conv = None
@@ -187,6 +190,7 @@ def messages(request):
             conv = a[0]
             conv.is_delete_by_sendPeople = False
         elif len(b) > 0:
+            conv = b[0]
             conv.is_delete_by_acceptPeople = False
         else:
             conv = Conversation.objects.create(send_user=send_user, accept_user=accept_user)
@@ -237,14 +241,9 @@ def conversation(request, convId):
 
 @login_required
 def delete_conversation(request):
-    conv_id = request.GET.get('conv_id')
+    convId = request.GET.get('conv_id')
     current_user = request.user
-    conv = Conversation.objects.filter(id=conv_id)[0]
-    if current_user == conv.send_user:
-        conv.is_delete_by_sendPeople = True
-    else:
-        conv.is_delete_by_acceptPeople = True
-    conv.save()
+    min_delete_conversation(convId, current_user)
     return redirect(reverse('Rehabilitation:messages'))
 
 
@@ -254,7 +253,17 @@ def shield_user(request, convId):
     current_user = request.user
     other_user = get_other_user(current_user, conv)
     Blacklist.objects.create(master_user=current_user, black_user=other_user)
+    min_delete_conversation(convId, current_user)
     return redirect(reverse('Rehabilitation:messages'))
+
+
+def min_delete_conversation(convId, current_user):
+    conv = Conversation.objects.filter(id=convId)[0]
+    if current_user == conv.send_user:
+        conv.is_delete_by_sendPeople = True
+    else:
+        conv.is_delete_by_acceptPeople = True
+    conv.save()
 
 
 def findComment(comment_list):

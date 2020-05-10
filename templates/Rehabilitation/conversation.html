@@ -14,7 +14,7 @@
             <div class="col-xs-12 col-md-9 main">
                 <div class="clearfix mt15">
                     <a href="{% url 'Rehabilitation:messages' %}" class="pull-left btn btn-default btn-xs">← 返回列表</a>
-                    <a href="{% url 'Rehabilitation:messages' %}"
+                    <a href="{% url 'Rehabilitation:shieldUser' convId %}"
                        class="pull-right btn btn-default btn-xs ml10">屏蔽用户</a>
                     <a href="{% url 'Rehabilitation:deleteConversation' %}?conv_id={{ convId }}"
                        class="pull-right btn btn-default btn-xs ml10">删除会话</a>
