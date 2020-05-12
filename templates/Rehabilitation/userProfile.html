@@ -264,13 +264,13 @@
                                         <div class="tab-content">
                                             <div class="pl15" style="position:relative">
                                                 {% for article in dra_article %}
-                                                    <div class="media-body pt15 pb10"><a class="packup"
-                                                                                         data-toggle="tooltip"
-                                                                                         data-placement="left" title=""
-                                                                                         href=""
-                                                                                         data-original-title="收起"></a>
+                                                    <div class="media-body pt15 pb10">
+                                                        <a class="packup" data-toggle="tooltip"
+                                                           data-placement="left" title=""
+                                                           href=""
+                                                           data-original-title="收起"></a>
                                                         <h2 class="h4 title " style="display:block;">
-                                                            <a href="{% url 'Rehabilitation:article' article.id %}"
+                                                            <a href="{% url 'Rehabilitation:operateArticle' %}?article_id={{ article.id }}"
                                                                target="_blank">{{ article.title }}</a>
                                                         </h2>
                                                         <div class="row">
@@ -281,9 +281,9 @@
                                 bookmarks
                                  字段 =>
                                  是一篇文章 --><p class="text-muted mb0"><span
-                                                                class="info--meta mr10">赞 {% likeCount article %} </span>
-                                                            <span class="info--meta ml10">评论 {% commentCount article %} </span>
-                                                        </p></div>
+                                                            class="info--meta mr10">赞 {% likeCount article %} </span>
+                                                        <span class="info--meta ml10">评论 {% commentCount article %} </span>
+                                                    </p></div>
                                                 {% endfor %}
                                             </div>
                                         </div>

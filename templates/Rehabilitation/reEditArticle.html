@@ -1,0 +1,67 @@
+{% extends 'Rehabilitation/base.html' %}
+
+{% block title %}编辑文章{% endblock %}
+
+{% block static %}
+    <link rel="stylesheet" type="text/css" href="/static/summernote/summernote-bs4.css">
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.init.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/summernote/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/static/summernote/jquery.fileupload.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote.min.js"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="container my-4">
+        <form class="article-form" method="post" action="{% url 'Rehabilitation:operateArticle' %}">
+            {% csrf_token %}
+            <input name="article_id" value="{{ article.id }}" hidden type="text">
+            <div class="form-group">
+                <select class="form-control ml-auto hidden" id="revision"></select>
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-lg" name="title" value="{{ article.title }}" placeholder="请输入标题"
+                       type="text">
+            </div>
+            <div class="form-group">
+                <input class="form-control form-control-lg" name="brief" value="{{ article.brief }}" placeholder="请输入简介"
+                       type="text">
+            </div>
+            <div class="form-group form form--profile form-inline">
+                <select class="form-control form-control-lg" name="category">
+                    {% for category in category_list %}
+                        {% if category == article.category %}
+                            <option value="{{ category.id }}" selected>{{ category.name }}</option>
+                        {% else %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <label for="id_article_from">Article from:</label>
+            <textarea name="article_from" cols="40" rows="10" id="id_article_from" hidden="true"
+                      style="display: none;"></textarea>
+            <div class="summernote">{{ article.content |safe }}</div>
+            <div class="col-sm-4 col-md-3 col-lg-3">
+                <ul class="opts list-inline hidden-xs">
+                    <li class="menu__item">
+                        <button class="btn btn-primary btn-block" onclick="articleSubmit(this)" name="drift">保存</button>
+                    </li>
+                    <li class="menu__item">
+                        <button class="btn btn-primary btn-block" onclick="articleSubmit(this)" name="published">发布
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </form>
+        <input type="hidden" value="" id="text-hidden">
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('.summernote').summernote({'lang': 'zh-CN'})
+        })
+    </script>
+{% endblock %}

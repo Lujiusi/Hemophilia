@@ -30,7 +30,6 @@ class Register(View):
         r.password = request.POST['password']
         r.realname = request.POST.get('realname', '')
         r.nickname = request.POST.get('nickname', r.username)
-        r.avatar = request.FILES.get('avatar', None)
         r.gender = request.POST.get('gender', '')
         r.phone = request.POST.get('phone', '')
         r.email = request.POST.get('email', '')
@@ -114,7 +113,7 @@ class Logout(View):
 def article(request, articleId):
     art = Article.objects.filter(id=articleId)[0]
     comment_list = {}
-    for comment in Comment.objects.filter(article=art, parent_comment=None).order_by('date').all():
+    for comment in Comment.objects.filter(article=art, comment_type='1', parent_comment=None).order_by('date').all():
         if comment not in comment_list:
             comment_list[comment] = []
         for com in Comment.objects.filter(parent_comment=comment).order_by('date').all():
@@ -155,8 +154,20 @@ class OperateArticle(View):
 
     @staticmethod
     @login_required
+    def get(request):
+        current_user = request.user
+        article_id = request.GET.get('article_id')
+        category_list = Category.objects.all()
+        article = Article.objects.filter(id=article_id)[0]
+        return render(request, 'Rehabilitation/reEditArticle.html', locals())
+
+    @staticmethod
+    @login_required
     def post(request):
+        article_id = request.POST.get('article_id')
         article = Article()
+        if article_id:
+            article = Article.objects.filter(id=article_id)[0]
         article.title = request.POST['title']
         article.brief = request.POST['brief']
         article.category_id = request.POST['category']

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django_summernote',
 ]
 
-SUMMERNOTE_THEME = 'bs3'
+SUMMERNOTE_THEME = 'bs4'
 
 SUMMERNOTE_CONFIG = {
     # Using SummernoteWidget - iframe mode, default
@@ -51,7 +51,7 @@ SUMMERNOTE_CONFIG = {
     'summernote': {
         # As an example, using Summernote Air-mode
         'airMode': False,
-
+        'lang': 'zh-CN',
         # Change editor size
         'width': '100%',
         'height': '480',

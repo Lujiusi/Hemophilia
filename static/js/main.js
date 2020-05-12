@@ -7,26 +7,39 @@ function loginOrRegister(e) {
 
 function register(e) {
     let url = $(e).attr('post_to');
-    if ($("#pw1").val().length >= 5 && validate() === 1) {
-        let username = $('#username').val();
-        let password = $('#pw1').val();
-        $.post(url, {
-                'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val(),
-                'username': username,
-                'password': password,
-            },
-            function (callback) {
-                is_success = callback['status'];
-                if (is_success === '1') {
-                    alert('注册成功，请登录');
-                    $('#register').css('display', 'none');
-                    $('#login').css('display', 'block');
-                    $("input[name='username']").val(username);
-                    $("input[name='password']").val(password);
-                }
-            }
-        )
+    let username = $('#username').val();
+    let password = $('#pw1').val();
+    if (username.length < 1) {
+        alert("用户名不可为空")
+        return
     }
+    if (password.length <= 5) {
+        alert("密码长度不可少于5位")
+        return
+    }
+    if (validate() !== 1) {
+        alert("两次密码输入不一致")
+        return
+    }
+
+    $.post(url, {
+            'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val(),
+            'username': username,
+            'password': password,
+        },
+        function (callback) {
+            is_success = callback['status'];
+            if (is_success === '1') {
+                alert('注册成功，请登录');
+                $('#register').css('display', 'none');
+                $('#login').css('display', 'block');
+                $("input[name='username']").val(username);
+                $("input[name='password']").val(password);
+            } else {
+                alert(callback['errorMsg'])
+            }
+        }
+    )
 }
 
 function login(e) {
@@ -160,7 +173,7 @@ function like(e) {
             console.log(callback)
         });
     if ($(e).text() === '已赞') {
-        $(e).css('background-color', '#337ab7');
+        $(e).css('background-color', 'green');
         $(e).text('点赞');
     } else {
         $(e).css('background-color', 'red');
@@ -169,12 +182,11 @@ function like(e) {
 }
 
 function articleSubmit(e) {
+    $('#id_article_from').html($('.note-editable').html())
     if ($(e).attr('name') === 'published') {
         $("form[class='article-form']").append('<input name="status" value="published">').submit();
-        alert('发布')
     } else {
         $("form[class='article-form']").append('<input name="status" value="draft">').submit();
-        alert('保存')
     }
 }
 

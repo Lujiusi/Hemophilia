@@ -21,7 +21,7 @@ class User(AbstractUser):
     nickname = models.CharField(verbose_name='昵称', max_length=32)
     signature = models.CharField(verbose_name='签名', max_length=255, blank=True, null=True)
     avatar = models.ImageField(verbose_name='用户头像', blank=True, upload_to=upload_to,
-                               default='/media/userpic/default.jpg')
+                               default='userpic/default.jpg')
     realname = models.CharField(verbose_name='姓名', max_length=32, default='', null=True)
     gender = models.CharField(verbose_name='性别', max_length=10, choices=(('男', '男'), ('女', '女')), default='男')
     phone = models.CharField(verbose_name='手机号码', max_length=64, default='', null=True)
